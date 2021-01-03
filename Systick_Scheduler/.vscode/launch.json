@@ -2,7 +2,7 @@
   "configurations": [
     {
       "cwd": "${workspaceFolder}",
-      "executable": "build/SVC_Handler.elf",
+      "executable": "build/Systick_Scheduler.elf",
       "configFiles": [
         "stm32l4discovery.cfg"
       ],
@@ -16,7 +16,7 @@
     },
     {
       "cwd": "${workspaceFolder}",
-      "executable": "build/SVC_Handler.elf",
+      "executable": "build/Systick_Scheduler.elf",
       "configFiles": [
         "stm32l4discovery.cfg"
       ],

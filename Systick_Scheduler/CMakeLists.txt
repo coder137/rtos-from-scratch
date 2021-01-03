@@ -6,7 +6,9 @@ set(CONTROLLER_NAME "STM32L475xx")
 
 # Project start
 set(CMAKE_TOOLCHAIN_FILE "cmake/toolchain.cmake")
-project(${PROJECT_NAME})
+project(${PROJECT_NAME}
+  LANGUAGES C ASM
+)
 
 # Get compiler and linker flags from here
 include(cmake/flags.cmake)
@@ -29,6 +31,7 @@ target_link_options(${USER_PROJECT_TARGET} PRIVATE
 # TODO, Add more subdirectories here
 add_subdirectory(l0_lowlevel)
 add_subdirectory(modules)
+add_subdirectory(application)
 
 # Tools and various custom targets
 include(cmake/targets.cmake)
