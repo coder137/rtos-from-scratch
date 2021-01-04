@@ -15,7 +15,7 @@
 
 # Spinlock Semaphore
 
-- Wait for a signal to be raised to gain access to a shared resource
+- Wait for a signal to be sent to gain access to a shared resource
 - During a **wait** this shared resource burns CPU cycles till it gets a signal from another thread.
 
 ![Spinlock Semaphore for UART](images/example2_spinlock_semaphore.PNG)
@@ -27,4 +27,7 @@
 
 # Cooperative Semaphore
 
-> TODO,
+- Wait for a signal to be sent to gain access to a shared resource
+- During a **wait** this shared resource **yields** to a different thread if it does not have access to the shared resource.
+
+**NOTE** The output and working of the Cooperative Semaphore is similar to the Spinlock Semaphore. However the cooperative semaphore is more efficient since it does not burn unnecessary CPU cycles.
