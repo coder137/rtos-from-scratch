@@ -1,4 +1,5 @@
 #include "osKernel.h"
+#include "osSemaphore.h"
 
 #include "gpio/gpio.h"
 #include "uart/uart.h"
@@ -11,18 +12,23 @@ static UART_s uart_config;
 
 // * Add these variables to the debug watch window
 static uint32_t i, j, k;
+static uint32_t semaphore_t1, semaphore_t2;
 
 void t1(void) {
   while (1) {
+    osSemaphoreWait(&semaphore_t1);
     i++;
     uart__write_string(&uart_config, "Hello World from Thread 1\r\n");
+    osSemaphoreSignal(&semaphore_t2);
   }
 }
 
 void t2(void) {
   while (1) {
+    osSemaphoreWait(&semaphore_t2);
     j++;
     uart__write_string(&uart_config, "Hello World from Thread 2\r\n");
+    osSemaphoreSignal(&semaphore_t1);
   }
 }
 
@@ -33,6 +39,9 @@ void t3(void) {
 }
 
 int main(void) {
+  osSemaphoreInit(&semaphore_t1, 1);
+  osSemaphoreInit(&semaphore_t2, 0);
+
   main__uart_init();
   uart__write_string(&uart_config, "Hello World\r\n");
 
