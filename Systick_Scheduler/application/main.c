@@ -6,6 +6,7 @@ static uint32_t i, j, k;
 void t1(void) {
   while (1) {
     i++;
+    osKernelYield();
   }
 }
 

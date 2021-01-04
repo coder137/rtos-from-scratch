@@ -68,6 +68,15 @@ void osKernelLaunch(uint32_t quanta) {
   osSchedulerLaunch();
 }
 
+static const uint8_t PENDSTSET = 26;
+void osKernelYield(void) {
+  // Clear SysTick VAL since it can contain arbritary values
+  SysTick->VAL = 0;
+
+  // Raise the SysTick Interrupt
+  SCB->ICSR = (1 << PENDSTSET);
+}
+
 // Static functions
 static void osKernelStackInit(int thread_number) {
   // STACKSIZE = 100
