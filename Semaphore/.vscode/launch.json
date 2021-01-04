@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "build/Semaphore.elf",
+      "configFiles": [
+        "stm32l4discovery.cfg"
+      ],
+      "postLaunchCommands": [
+        "monitor arm semihosting enable",
+      ],
+      "name": "Debug Microcontroller",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd"
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "build/Semaphore.elf",
+      "configFiles": [
+        "stm32l4discovery.cfg"
+      ],
+      "postLaunchCommands": [
+        "load",
+        "monitor arm semihosting enable",
+      ],
+      "name": "Load and Debug Microcontroller",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd"
+    }
+  ]
+}
