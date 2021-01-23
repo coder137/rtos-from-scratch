@@ -88,4 +88,60 @@ static void osKernelStackInit(int thread_number) {
   // xPSR, PC, LR, r12, r3, r2, r1, r0
   // r11, r10, r9, r8, r7, r6, r5, r4
   TCB_STACK[thread_number][STACKSIZE - 1] = 0x01000000;
+
+  // Thread 0 - 100 onwards
+  // Thread 1 - 200 onwards
+  // Thread 2 - 300 onwards
+  // We can see these values when debugging (register view)
+  uint32_t tn = thread_number * 100 + 100;
+  TCB_STACK[thread_number][STACKSIZE - 4] = tn + 4;
+  TCB_STACK[thread_number][STACKSIZE - 5] = tn + 5;
+  TCB_STACK[thread_number][STACKSIZE - 6] = tn + 6;
+  TCB_STACK[thread_number][STACKSIZE - 7] = tn + 7;
+  TCB_STACK[thread_number][STACKSIZE - 8] = tn + 8; // r0
+
+  TCB_STACK[thread_number][STACKSIZE - 9] = tn + 9; // r11
+  TCB_STACK[thread_number][STACKSIZE - 10] = tn + 10;
+  TCB_STACK[thread_number][STACKSIZE - 11] = tn + 11;
+  TCB_STACK[thread_number][STACKSIZE - 12] = tn + 12;
+  TCB_STACK[thread_number][STACKSIZE - 13] = tn + 13;
+  TCB_STACK[thread_number][STACKSIZE - 14] = tn + 14;
+  TCB_STACK[thread_number][STACKSIZE - 15] = tn + 15;
+  TCB_STACK[thread_number][STACKSIZE - 16] = tn + 16; // r4
 }
+
+#if INLINE_ASSEMBLY
+
+// NOTE, Do not use the __attribute__((naked)) flag for both these functions
+// We want the function to pop their register values and exit (BX LR)
+
+void SysTick_Handler() {
+  __disable_irq();
+  __ASM volatile("PUSH {R4-R11}\n"
+                 "LDR R0,=currentPt\n"
+                 "LDR R1,[R0]\n"
+                 "STR SP,[R1]\n"
+                 "LDR R1, [R1, #4]\n"
+                 "STR R1, [R0]\n"
+                 "LDR SP, [R1]\n"
+                 "POP {R4-R11}\n");
+  __enable_irq();
+  // NOTE, On exit this function POPs R0-R3 and R12 register
+}
+
+void osSchedulerLaunch() {
+  __ASM volatile("LDR R0,=currentPt\n"
+                 "LDR R2,[R0]\n"
+                 "LDR SP,[R2]\n"
+                 "POP {R4-R11}\n"
+                 "POP {R0-R3}\n"
+                 "POP {R12}\n"
+                 "ADD SP,SP,#4\n"
+                 "POP {LR}\n"
+                 "ADD SP,SP,#4\n");
+  __enable_irq();
+  // NOTE, here we manually pop the registers to initially load the values from
+  // the thread stack
+}
+
+#endif
