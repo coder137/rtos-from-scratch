@@ -6,13 +6,21 @@ set(CONTROLLER_NAME "STM32L475xx")
 
 # Project start
 set(CMAKE_TOOLCHAIN_FILE "cmake/toolchain.cmake")
-project(${PROJECT_NAME})
+project(${PROJECT_NAME}
+  LANGUAGES C ASM
+)
 
 # Get compiler and linker flags from here
 include(cmake/flags.cmake)
 
 set(USER_PROJECT_TARGET "${PROJECT_NAME}.elf")
-add_executable(${USER_PROJECT_TARGET} application/main.c)
+add_executable(${USER_PROJECT_TARGET} 
+  application/main.c
+  # application/irq.S
+
+  # Same as irq.S but written in inline assembly
+  application/irq.c 
+)
 
 target_compile_definitions(${USER_PROJECT_TARGET} PRIVATE 
   ${CONTROLLER_NAME}
