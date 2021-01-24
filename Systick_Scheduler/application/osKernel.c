@@ -117,31 +117,54 @@ static void osKernelStackInit(int thread_number) {
 
 void SysTick_Handler() {
   __disable_irq();
-  __ASM volatile("PUSH {R4-R11}\n"
-                 "LDR R0,=currentPt\n"
-                 "LDR R1,[R0]\n"
-                 "STR SP,[R1]\n"
-                 "LDR R1, [R1, #4]\n"
-                 "STR R1, [R0]\n"
-                 "LDR SP, [R1]\n"
-                 "POP {R4-R11}\n");
+  // __ASM volatile("PUSH {R4-R11}\n"
+  //                "LDR R0,=currentPt\n"
+  //                "LDR R1,[R0]\n"
+  //                "STR SP,[R1]\n" // currentPt->stackPt = sp
+  //                "LDR R1, [R1, #4]\n"
+  //                "STR R1, [R0]\n"
+  //                "LDR SP, [R1]\n"
+  //                "POP {R4-R11}\n");
+
+  // * NOTE, The code below is the same as the one above
+
+  __ASM volatile("PUSH {R4-R11}\n");
+  // currentPt->stackPt = sp;
+  __ASM volatile("MOV %[stackPt],sp\n" : [stackPt] "=r"(currentPt->stackPt));
+  currentPt = currentPt->nextPt;
+
+  // sp = currentPt->stackPt;
+  __ASM volatile("MOV SP,%[stackPt]\n" ::[stackPt] "r"(currentPt->stackPt));
+  __ASM volatile("POP {R4-R11}\n");
+
   __enable_irq();
   // NOTE, On exit this function POPs R0-R3 and R12 register
 }
 
 void osSchedulerLaunch() {
-  __ASM volatile("LDR R0,=currentPt\n"
-                 "LDR R2,[R0]\n"
-                 "LDR SP,[R2]\n"
-                 "POP {R4-R11}\n"
+  // __ASM volatile("LDR R0,=currentPt\n"
+  //                "LDR R2,[R0]\n"
+  //                "LDR SP,[R2]\n"
+  //                "POP {R4-R11}\n"
+  //                "POP {R0-R3}\n"
+  //                "POP {R12}\n"
+  //                "ADD SP,SP,#4\n"
+  //                "POP {LR}\n"
+  //                "ADD SP,SP,#4\n");
+
+  // * NOTE, The code below is the same as the one above
+
+  // sp = currentPt->stackPt;
+  __ASM volatile("MOV SP,%[stackPt]\n" ::[stackPt] "r"(currentPt->stackPt));
+  __ASM volatile("POP {R4-R11}\n"
                  "POP {R0-R3}\n"
                  "POP {R12}\n"
                  "ADD SP,SP,#4\n"
                  "POP {LR}\n"
                  "ADD SP,SP,#4\n");
   __enable_irq();
-  // NOTE, here we manually pop the registers to initially load the values from
-  // the thread stack
+  // NOTE, here we manually pop the registers to initially load
+  // the values from the thread stack
 }
 
 #endif
